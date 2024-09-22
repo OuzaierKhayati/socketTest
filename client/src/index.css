@@ -1,0 +1,46 @@
+body {
+  background-color: hsl(0, 0%, 29%);
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+.container{
+  /* border: 2px solid white; */
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  gap: 10px;
+}
+h1{
+  color: white;
+}
+.input-field{
+  background-color: hsl(0, 0%, 67%);
+  height: 2rem;
+  padding-left: 0.5rem;
+  outline: none;
+  width: 20rem;
+}
+.send-scores{
+  width: 100px;
+  height: 30px;
+}
+table{
+  font-family: monospace;
+  font-size: 1rem;
+  font-weight: 0;
+  border-collapse: collapse;
+  width: 50%;
+}
+td,th{
+  border: 2px solid hsl(0, 0%, 100%);
+  text-align: left;
+  padding: 8px;
+  color: white;
+}
