@@ -1,16 +1,16 @@
 const express = require('express');
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-const path = require('path');  // Built-in Node.js module to work with file paths
+const path = require('path');
 
 const app = express();
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
     cors: {
-        origin: 'http://localhost:3000', // Use your client URL or Render/Railway URL if hosted
-        methods: ["GET", "POST"], // Optional, specify allowed methods
-        credentials: true // Optional, if you need to include cookies in requests
+        origin: process.env.CLIENT_URL || 'http://localhost:3000', // Update this as needed
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 
@@ -18,6 +18,7 @@ let playerScores = [];
 
 // Handle Socket.io connections
 io.on("connection", (socket) => {
+    console.log('A user connected:', socket.id);
     socket.emit("playerScores", playerScores);
     
     socket.on("scores", (data) => {
@@ -26,6 +27,13 @@ io.on("connection", (socket) => {
     });
 
     socket.on("updateScores", () => {
+        io.emit("playerScores", playerScores);
+    });
+
+    socket.on("disconnect", () => {
+        console.log('User disconnected:', socket.id);
+        // Remove the player's scores if needed
+        playerScores = playerScores.filter(player => player.id !== socket.id);
         io.emit("playerScores", playerScores);
     });
 });
