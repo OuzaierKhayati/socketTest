@@ -15,7 +15,10 @@ function App() {
   }
   
   function sendScores(){
-    socket.emit("scores", score);
+    if(score.name && !isNaN(score.score)){
+      socket.emit("scores", score);
+      console.log(playerScores);
+    }
   }
   
   useEffect(() => {
@@ -39,8 +42,8 @@ function App() {
               <th>Name</th>
               <th>Score</th>
             </tr>
-            {playerScores.map((playerScore) => (
-              <tr key={playerScore.id}>
+            {playerScores.map((playerScore, index) => (
+              <tr key={index}>
                 <th>{playerScore?.name}</th>
                 <th>{playerScore?.score}</th>
               </tr>
