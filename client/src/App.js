@@ -20,14 +20,15 @@ function App() {
       console.log(playerScores);
     }
   }
-  
-  useEffect(() => {
 
-    socket.on("playerScores", (playerScores) => {
-      setPlayerScores(playerScores);
-    });
-    return() => socket.off("playerScores")
-  }, [socket]);
+  useEffect(() => {
+    if(score.name && !isNaN(score.score)){
+      socket.on("playerScores", (playerScores) => {
+        setPlayerScores(playerScores);
+      });
+      return() => socket.off("playerScores")
+    }
+  }, [socket,score.name, score.score]);
 
   return (
     <div className="container">
