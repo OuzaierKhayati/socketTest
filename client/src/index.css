@@ -44,3 +44,31 @@ td,th{
   padding: 8px;
   color: white;
 }
+span{
+  margin-top: 20px;
+}
+.no-underline {
+  text-decoration: none;
+  color: black;
+  font-size: 2rem;
+  margin: 20px;
+}
+.no-underline:hover{
+  color: hsla(117, 100%, 42%, 0.73);
+  text-decoration:underline;
+  transition: color 5ms ease;
+}
+.drawBoard{
+  margin-top: 0px;
+  margin-left: -25px;
+  height: 350px;
+  width: 700px;
+  background-color:transparent;
+  display: flex;
+  flex-direction: column;
+}
+.cnavasPage{
+  border-radius: 20px;
+  border:2px solid hsl(0, 0%, 59%);
+  background-color: white;
+}

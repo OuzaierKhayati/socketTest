@@ -2,7 +2,7 @@ const express = require('express');
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const path = require('path');
-
+const { drawHandler } = require("./handlers/draw.handler");
 const app = express();
 const httpServer = createServer(app);
 
@@ -36,6 +36,8 @@ io.on("connection", (socket) => {
         playerScores = playerScores.filter(player => player.id !== socket.id);
         io.emit("playerScores", playerScores);
     });
+
+    drawHandler(io, socket);
 });
 
 // Serve static files from the React app's build folder
