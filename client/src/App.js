@@ -3,6 +3,7 @@ import {BrowserRouter as Router, Routes, Route, Link} from "react-router-dom";
 import { SocketContext } from "./socketContext";
 import Input from "./components/input";
 import Draw from "./components/draw";
+import Chat from "./components/chat";
 
 function App() {
   const socket = useContext(SocketContext);
@@ -60,6 +61,7 @@ function App() {
               )}
               <span>
                 <Link to="/draw" className="no-underline">DrawBoard</Link>
+                <Link to="/chat" className="no-underline">Quick Chat</Link>
               </span>
             </>
           } />
@@ -69,6 +71,14 @@ function App() {
                 <Link to="/" className="no-underline">Remove DrawBoard</Link>
               </span>
               <Draw />
+            </>
+          } />
+          <Route path="/chat" element={
+            <>
+              <span>
+                <Link to="/" className="no-underline">Quit chat</Link>
+              </span>
+              <Chat />
             </>
           } />
         </Routes>

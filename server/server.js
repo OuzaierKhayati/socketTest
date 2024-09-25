@@ -3,6 +3,7 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 const path = require('path');
 const { drawHandler } = require("./handlers/draw.handler");
+const { chatHandler } = require('./handlers/chat.handler');
 const app = express();
 const httpServer = createServer(app);
 
@@ -20,6 +21,7 @@ let playerScores = [];
 io.on("connection", (socket) => {
     console.log('A user connected:', socket.id);
     socket.emit("playerScores", playerScores);
+    socket.emit("tranID", socket.id)
     
     socket.on("scores", (data) => {
         playerScores.push({ ...data, id: socket.id });
@@ -35,9 +37,12 @@ io.on("connection", (socket) => {
         // Remove the player's scores if needed
         playerScores = playerScores.filter(player => player.id !== socket.id);
         io.emit("playerScores", playerScores);
-    });
 
+        chatHandler(io,socket,false);
+    });
+    
     drawHandler(io, socket);
+    chatHandler(io,socket,true);
 });
 
 // Serve static files from the React app's build folder

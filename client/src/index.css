@@ -72,3 +72,26 @@ span{
   border:2px solid hsl(0, 0%, 59%);
   background-color: white;
 }
+.chatBox{
+  border: 2px solid white;
+  width: 800px;
+  height: auto;
+}
+.message-left {
+  text-align: left;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 5px;
+  width: fit-content;
+}
+
+.message-right {
+  text-align: right;
+  background-color: #d1e7dd;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 5px;
+  margin-left: auto;
+  width: fit-content;
+}
