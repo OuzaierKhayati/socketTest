@@ -21,7 +21,11 @@ let playerScores = [];
 io.on("connection", (socket) => {
     console.log('A user connected:', socket.id);
     socket.emit("playerScores", playerScores);
-    socket.emit("tranID", socket.id)
+    socket.emit("tranID", socket.id);
+
+    socket.on("requestMyId", (data, callback) => {
+        callback(socket.id);
+    });
     
     socket.on("scores", (data) => {
         playerScores.push({ ...data, id: socket.id });

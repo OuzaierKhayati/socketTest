@@ -7,6 +7,9 @@ const chatHandler = async (io, socket, bool) => {
             allMessages.push({ ...data, id: socket.id });
             io.emit("allMessages", allMessages);
         });
+        socket.on("getMessages", (data, callback) => {
+            callback(allMessages);
+        });
     }else{
         allMessages = allMessages.filter(user => user.id !== socket.id);
         io.emit("allMessages",allMessages );

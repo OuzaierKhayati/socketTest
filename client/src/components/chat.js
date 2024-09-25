@@ -1,25 +1,54 @@
-import React, { useContext, useEffect,useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState, useCallback } from "react";
 import { SocketContext } from "../socketContext";
 
 function Chat() {
     const socket = useContext(SocketContext);
     const [message, setMessage] = useState({ msg: "" });
     const [allMessages, setAllMessages] = useState([]);
-    const [myId, setMyId] = useState("");
+    const [myId, setMyId] = useState(localStorage.getItem('myId') || "");
+
     const inputRef = useRef(null);
+
+    // Use useCallback to memoize the requestMyId function
+    const requestMyId = useCallback(() => {
+        socket.emit("requestMyId", {}, (id) => {
+            setMyId(id);
+            localStorage.setItem('myId', id);
+        });
+    }, [socket]);
 
     // Get the socket ID when the component mounts
     useEffect(() => {
+        requestMyId();
+
         socket.on("tranID", (id) => {
             setMyId(id);
+            localStorage.setItem('myId', id);
         });
 
-        // Clean up the socket event when the component unmounts
-        return () => socket.off("tranID");
+        socket.emit("getMessages", {}, (data) => {
+            setAllMessages(data);
+        });
+
+        return () => {
+            socket.off("tranID");
+            socket.off("allMessages");
+        };
+    }, [socket, requestMyId]);
+
+    useEffect(() => {
+        // Listen for new messages
+        socket.on("allMessages", (data) => {
+            setAllMessages(data);
+        });
+
+        return () => {
+            socket.off("allMessages");
+        };
     }, [socket]);
 
     function handleInput(event) {
-        let { name, value } = event.target;
+        const { name, value } = event.target;
         setMessage((prevMessage) => ({
             ...prevMessage,
             [name]: value,
@@ -33,14 +62,6 @@ function Chat() {
             inputRef.current.focus();
         }
     }
-
-    useEffect(() => {
-        socket.on("allMessages", (data) => {
-            setAllMessages(data);
-        });
-
-        return () => socket.off("allMessages");
-    }, [socket]);
 
     return (
         <>
@@ -58,13 +79,13 @@ function Chat() {
                     </p>
                 ))}
             </div>
-            <input 
+            <input
                 className="input-field"
-                name="msg" 
-                placeholder="Type your message" 
-                onChange={handleInput} 
+                name="msg"
+                placeholder="Type your message"
+                onChange={handleInput}
                 value={message.msg}
-                ref={inputRef} 
+                ref={inputRef}
             />
             <button onClick={send}>Send</button>
         </>
