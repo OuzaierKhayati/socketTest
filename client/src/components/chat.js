@@ -44,16 +44,6 @@ function Chat() {
 
     return (
         <>
-            <input 
-                className="input-field"
-                name="msg" 
-                placeholder="Type your message" 
-                onChange={handleInput} 
-                value={message.msg}
-                ref={inputRef} 
-            />
-            <button onClick={send}>Send</button>
-
             <div className="chatBox">
                 {allMessages.map((allMessage, index) => (
                     <p
@@ -68,6 +58,15 @@ function Chat() {
                     </p>
                 ))}
             </div>
+            <input 
+                className="input-field"
+                name="msg" 
+                placeholder="Type your message" 
+                onChange={handleInput} 
+                value={message.msg}
+                ref={inputRef} 
+            />
+            <button onClick={send}>Send</button>
         </>
     );
 }

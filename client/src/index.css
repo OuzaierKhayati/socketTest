@@ -73,8 +73,8 @@ span{
   background-color: white;
 }
 .chatBox{
-  border: 2px solid white;
-  width: 800px;
+  /* border: 2px solid white; */
+  width: 400px;
   height: auto;
 }
 .message-left {
@@ -88,10 +88,15 @@ span{
 
 .message-right {
   text-align: right;
-  background-color: #d1e7dd;
+  background-color: #d1e5e7;
   padding: 10px;
   border-radius: 10px;
   margin: 5px;
   margin-left: auto;
   width: fit-content;
+}
+p{
+  max-width: 150px;
+  word-wrap:break-word;
+  overflow-wrap: break-word;
 }
