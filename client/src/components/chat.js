@@ -6,7 +6,8 @@ function Chat() {
     const [message, setMessage] = useState({ msg: "" });
     const [allMessages, setAllMessages] = useState([]);
     const [myId, setMyId] = useState(localStorage.getItem('myId') || "");
-
+    const [userName, setUserName] = useState(""); // State for user's name
+    const [isNameSet, setIsNameSet] = useState(false); // State to track if the name is set
     const inputRef = useRef(null);
 
     // Use useCallback to memoize the requestMyId function
@@ -55,9 +56,22 @@ function Chat() {
         }));
     }
 
+    function handleNameChange(event) {
+        setUserName(event.target.value); // Update user's name
+    }
+
+    function setName() {
+        // This will set the username when the button is clicked
+        if (userName) {
+            socket.emit("setUserName", userName); // Emit event to set the username on the server if needed
+            setIsNameSet(true); // Set the name confirmation state
+        }
+    }
+
     function send() {
-        if (message.msg) {
-            socket.emit("messages", message);
+        if (message.msg && userName) {
+            // Include user's name in the message
+            socket.emit("messages", { ...message, name: userName });
             setMessage({ msg: "" });
             inputRef.current.focus();
         }
@@ -65,29 +79,46 @@ function Chat() {
 
     return (
         <>
-            <div className="chatBox">
-                {allMessages.map((allMessage, index) => (
-                    <p
-                        key={index}
-                        className={
-                            allMessage.id === myId
-                                ? "message-right"
-                                : "message-left"
-                        }
-                    >
-                        {allMessage.msg}
-                    </p>
-                ))}
-            </div>
-            <input
-                className="input-field"
-                name="msg"
-                placeholder="Type your message"
-                onChange={handleInput}
-                value={message.msg}
-                ref={inputRef}
-            />
-            <button onClick={send}>Send</button>
+            {!isNameSet ? (
+                // If the name is not set, show input for the user to enter their name
+                <div className="nameInput">
+                    <input
+                        type="text"
+                        placeholder="Enter your name"
+                        value={userName}
+                        onChange={handleNameChange} // Controlled input
+                    />
+                    <button onClick={setName}>Set Name</button>
+                </div>
+            ) : (
+                // Chat UI
+                <>
+                    <div className="chatBox">
+                        {allMessages.map((allMessage, index) => (
+                            <p
+                                key={index}
+                                className={
+                                    allMessage.id === myId
+                                        ? "message-right"
+                                        : "message-left"
+                                }
+                            >
+                                <strong>{allMessage.name}: </strong> {/* Display user's name */}
+                                {allMessage.msg}
+                            </p>
+                        ))}
+                    </div>
+                    <input
+                        className="input-field"
+                        name="msg"
+                        placeholder="Type your message"
+                        onChange={handleInput}
+                        value={message.msg}
+                        ref={inputRef}
+                    />
+                    <button onClick={send}>Send</button>
+                </>
+            )}
         </>
     );
 }
