@@ -4,6 +4,7 @@ const { Server } = require("socket.io");
 const path = require('path');
 const { drawHandler } = require("./handlers/draw.handler");
 const { chatHandler } = require('./handlers/chat.handler');
+const { ticHandler } = require('./handlers/tic.handler');
 const app = express();
 const httpServer = createServer(app);
 
@@ -47,6 +48,8 @@ io.on("connection", (socket) => {
     
     drawHandler(io, socket);
     chatHandler(io,socket,true);
+    ticHandler(io,socket);
+
 });
 
 // Serve static files from the React app's build folder

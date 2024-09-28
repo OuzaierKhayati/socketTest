@@ -4,6 +4,7 @@ import { SocketContext } from "./socketContext";
 import Input from "./components/input";
 import Draw from "./components/draw";
 import Chat from "./components/chat";
+import Tic from "./components/tictactoe";
 
 function App() {
   const socket = useContext(SocketContext);
@@ -62,6 +63,7 @@ function App() {
               <span>
                 <Link to="/draw" className="no-underline">DrawBoard</Link>
                 <Link to="/chat" className="no-underline">Quick Chat</Link>
+                <Link to = "/tictactoe" className="no-underline">Tic-Tac-Toe</Link>
               </span>
             </>
           } />
@@ -79,6 +81,14 @@ function App() {
                 <Link to="/" className="no-underline">Quit chat</Link>
               </span>
               <Chat />
+            </>
+          } />
+          <Route path="/tictactoe" element={
+            <>
+              <Tic />
+              <span>
+                <Link to="/" className="no-underline">Quit</Link>
+              </span>
             </>
           } />
         </Routes>
