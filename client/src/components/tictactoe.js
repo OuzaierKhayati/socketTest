@@ -8,12 +8,20 @@ function Tictactoe(){
     const [xIsNext, setXIsNext] = useState(true);
     const [status, setStatus] = useState("First Player: X");
     const [stop, setStop] = useState(false);
+    const [players, setPlayers] = useState([]);
+    const [currentPlayer, setCurrentPlayer] = useState(null); 
+    const [myPlayerId, setMyPlayerId] = useState(null); 
 
     function Square({value, onSquareClick}){
         return <button className="square" onClick={onSquareClick}>{value}</button>
     }
 
     function handleClick(index){
+        if (myPlayerId !== currentPlayer) {
+            alert("Wait for your turn!");
+            return;
+        }
+
         const nextSquares = squares.slice();
 
         if (nextSquares[index] !== "") {
@@ -79,21 +87,24 @@ function Tictactoe(){
     }
 
     useEffect(() => {
-        socket.on("squares", (data)=>{
-            setSquares(data);
-        })
         socket.on("findWinner",(data)=>{
             setStatus(data);
             setStop(true);
         });
-        socket.on("changeTurn", (data)=>{
-            setXIsNext(data);
+        socket.on("squares", data => setSquares(data));
+        socket.on("changeTurn", data => setXIsNext(data));
+        socket.on("players", data => setPlayers(data));
+        socket.on("currentPlayer", (data) => {
+            setCurrentPlayer(data);
+            setMyPlayerId(socket.id);
         });
 
         return () => {
             socket.off('squares');
             socket.off('changeTurn');
             socket.off('findWinner');
+            socket.off('players');
+            socket.off('currentPlayer');
         };
 
     },[socket]);
@@ -121,6 +132,21 @@ function Tictactoe(){
                 </div>
             </div>
             <button onClick={reset} className='reset'>Replay</button>
+            {players.length > 0 && (
+                <table>
+                  <tbody>
+                    <tr>
+                      <th>ID</th>
+                    </tr>
+                    {players.map((player, index) => (
+                      <tr key={index}>
+                        <td>{player[0]}</td>
+                        <td>{player[1]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
         </>
     );
 };
