@@ -1,22 +1,22 @@
 import { useContext, useEffect, useState } from 'react';
-import {SocketContext} from "../socketContext";
+import { SocketContext } from "../socketContext";
 import './tictactoe.css';
 
-function Tictactoe(){
+function Tictactoe() {
     const socket = useContext(SocketContext);
     const [squares, setSquares] = useState(Array(9).fill(""));
     const [xIsNext, setXIsNext] = useState(true);
     const [status, setStatus] = useState("First Player: X");
     const [stop, setStop] = useState(false);
-    const [players, setPlayers] = useState([]);
     const [currentPlayer, setCurrentPlayer] = useState(null); 
     const [myPlayerId, setMyPlayerId] = useState(null); 
 
-    function Square({value, onSquareClick}){
+    function Square({ value, onSquareClick }) {
         return <button className="square" onClick={onSquareClick}>{value}</button>
     }
 
-    function handleClick(index){
+    function handleClick(index) {
+
         if (myPlayerId !== currentPlayer) {
             alert("Wait for your turn!");
             return;
@@ -24,36 +24,35 @@ function Tictactoe(){
 
         const nextSquares = squares.slice();
 
-        if (nextSquares[index] !== "") {
-            return;
-        }
-        if(stop){
+        if (nextSquares[index] !== "" || stop) {
             return;
         }
 
-        if(xIsNext){
+        if (xIsNext) {
             nextSquares[index] = "X";
-        }else{
+        } else {
             nextSquares[index] = "O";
         }
+
         socket.emit("nextSquares", nextSquares);
 
         const winner = calculateWinner(nextSquares);
-        if(winner){
-            socket.emit("winner","Winner: "+ winner);
+        if (winner) {
+            socket.emit("winner", "Winner: " + winner);
         }
 
         socket.emit("xIsNext", !xIsNext);
     }
 
-    function reset(){
+    function reset() {
         setSquares(Array(9).fill(""));
         setXIsNext(true);
-        setStatus("First Player: X"); 
+        setStatus("First Player: X");
         setStop(false);
+        socket.emit("winner",null);
     }
 
-    function calculateWinner(squares){
+    function calculateWinner(squares) {
         const lines = [
             [0, 1, 2],
             [3, 4, 5],
@@ -64,50 +63,58 @@ function Tictactoe(){
             [0, 4, 8],
             [2, 4, 6]
         ];
-        for (let i=0; i<8; i++){
-            if( squares[lines[i][0]] === squares[lines[i][1]] && 
-                squares[lines[i][1]] === squares[lines[i][2]]
-            ){
-                return squares[lines[i][0]];
+        for (let i = 0; i < 8; i++) {
+            const [a, b, c] = lines[i];
+            if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+                return squares[a];
             }
         }
         return null;
     }
 
-    function getStatus(){
+    function getStatus() {
         if (!stop) {
-            if (squares.every(square => square === "")) {
-                return "First Player: X";
-            } else {
-                return "Next Player: " + (xIsNext ? "X" : "O");
-            }
+            return squares.every(square => square === "") ? "First Player: X" : "Next Player: " + (xIsNext ? "X" : "O");
         } else {
             return status;
         }
     }
 
     useEffect(() => {
-        socket.on("findWinner",(data)=>{
-            setStatus(data);
-            setStop(true);
+        socket.on("squares", (data) => {
+            setSquares(data);
         });
-        socket.on("squares", data => setSquares(data));
-        socket.on("changeTurn", data => setXIsNext(data));
-        socket.on("players", data => setPlayers(data));
-        socket.on("currentPlayer", (data) => {
-            setCurrentPlayer(data);
+
+        socket.on("findWinner", (data) => {
+            if(data === null){
+                setStatus("First Player: X");
+                setStop(false);
+            }else{
+                setStatus(data);
+                setStop(true);
+            }
+        });
+
+        socket.on("changeTurn", (data) => {
+            setXIsNext(data);
+        });
+
+        socket.on("gameState", (data) => {
+            setSquares(data.board);
+            setXIsNext(data.xIsNext);
+            setCurrentPlayer(data.currentPlayer);
             setMyPlayerId(socket.id);
+            setStatus("First Player: X");
+            setStop(false);
         });
 
         return () => {
             socket.off('squares');
-            socket.off('changeTurn');
             socket.off('findWinner');
-            socket.off('players');
-            socket.off('currentPlayer');
+            socket.off('changeTurn');
+            socket.off('gameState');
         };
-
-    },[socket]);
+    }, [socket]);
 
     return (
         <>
@@ -132,22 +139,8 @@ function Tictactoe(){
                 </div>
             </div>
             <button onClick={reset} className='reset'>Replay</button>
-            {players.length > 0 && (
-                <table>
-                  <tbody>
-                    <tr>
-                      <th>ID</th>
-                    </tr>
-                    {players.map((player, index) => (
-                      <tr key={index}>
-                        <td>{player[0]}</td>
-                        <td>{player[1]}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
         </>
     );
-};
+}
 export default Tictactoe;
+
